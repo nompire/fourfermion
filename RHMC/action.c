@@ -104,7 +104,7 @@ double scalar_action(double *plus_act, double *minus_act) {
     as_copy((antisym *)gen_pt[dir][i],&tempas_dir);
     as_copy((antisym *)gen_pt[OPP_DIR(dir)][i],&tempas_opp);
     add_as(&tempas_dir,&tempas_opp,&tempas);
-    sum += as_dot(&(s->sigma),&tempas);
+    sum += as_dot(&(s->sigma),&tempas); // Dot product for two antisymmetric fields
 
     }
   }
