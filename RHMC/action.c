@@ -87,7 +87,7 @@ double scalar_action(double *plus_act, double *minus_act) {
   *minus_act += kappa*NDIMS*(*minus_act);
   
   
-  // Kinetic term for the anti-symmetric scalar field which is 
+  // Kinetic term for the anti-symmetric scalar field 
   // Run the gather call for scalar_field 
   for(dir = XUP; dir <= TUP; dir++){
    tag[dir] = start_gather_site(F_OFFSET(sigma), sizeof(antisym), dir,
