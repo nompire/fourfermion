@@ -42,7 +42,9 @@ double scalar_action(double *plus_act, double *minus_act) {
   register int i;
   register site *s;
   int a, b, c, d;
-  double tr, s_action;
+  double tr, s_action,sum=0.0;
+  msg_tag *tag[2*NDIMS];
+  antisym tempas_dir,tempas_opp,tempas;
   antisym plus, minus;
 
   // Initialize plus_act and minus_act
@@ -79,9 +81,38 @@ double scalar_action(double *plus_act, double *minus_act) {
   }
   g_doublesum(plus_act);
   g_doublesum(minus_act);
+  
+  // Additional factors of kappa*NDIMS comes from d'Alembertian acting on the scalar field
+  *plus_act += kappa*NDIMS*(*plus_act);
+  *minus_act += kappa*NDIMS*(*minus_act);
+  
+  
+  // Kinetic term for the anti-symmetric scalar field which is 
+  // Run the gather call for scalar_field 
+  for(dir = XUP; dir <= TUP; dir++){
+   tag[dir] = start_gather_site(F_OFFSET(sigma), sizeof(antisym), dir,
+                                   EVENANDODD, gen_pt[dir]);
+   tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(sigma), sizeof(antisym), OPP_DIR(dir),
+                                   EVENANDODD, gen_pt[OPP_DIR(dir)]);
+  }
+  for(dir = XUP; dir <=TUP; dir++){
 
+   wait_gather(tag[dir]);
+   wait_gather(tag[OPP_DIR(dir)]);
+
+    FORALLSITES(i,s){
+    as_copy((antisym *)gen_pt[dir][i],&tempas_dir);
+    as_copy((antisym *)gen_pt[OPP_DIR(dir)][i],&tempas_opp);
+    add_as(&tempas_dir,&tempas_opp,&tempas);
+    sum += as_dot(&(s->sigma),&tempas);
+
+    }
+  }
+  g_doublesum(&sum);
+  sum *= -0.5*kappa;
+  
   // Total action is just sum
-  s_action = *plus_act + *minus_act;
+  s_action = *plus_act + *minus_act + sum;
   return s_action;
 }
 // -----------------------------------------------------------------
