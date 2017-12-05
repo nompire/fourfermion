@@ -63,6 +63,7 @@ EXTERN int sd_index[DIMF][DIMF];
 // More global parameters
 EXTERN Real rsqmin, rsqprop;
 EXTERN Real G;
+EXTERN Real kappa;        // Hopping parameter for scalar field
 EXTERN Real site_mass, link_mass;
 EXTERN int stagger;       // Whether or not to use staggered site bilinear
 EXTERN double sigmasum;
