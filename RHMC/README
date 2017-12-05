@@ -52,6 +52,7 @@ nstep_gauge 10        # Gauge steps per fermion step
 traj_between_meas 1   # How many trajectories to skip between less-frequent measurements
 
 G 0.5                 # Four-fermion coupling
+kappa 0.1             # Kinetic term for scalar field
 site_mass 0.1         # On-site SO(4)-breaking mass term (staggered if negative)
 link_mass 0.1         # SO(4)-symmetric shift-symmetry-breaking mass term
 
