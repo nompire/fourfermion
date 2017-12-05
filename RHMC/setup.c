@@ -211,6 +211,9 @@ int readin(int prompt) {
     // Four-fermion coupling
     IF_OK status += get_f(stdin, prompt, "G", &par_buf.G);
 
+    // Scalar field kinetic term
+    IF_OK status += get_f(stdin, prompt, "kappa", &par_buf.kappa);
+ 
     // On-site SO(4)-breaking mass term
     IF_OK status += get_f(stdin, prompt, "site_mass", &par_buf.site_mass);
 
@@ -279,6 +282,7 @@ int readin(int prompt) {
   rsqmin = par_buf.rsqmin;
 
   G = par_buf.G;
+  kappa = par_buf.kappa;
   site_mass = par_buf.site_mass;
   link_mass = par_buf.link_mass;
   if (G == 0.0 && site_mass != 0.0) {
