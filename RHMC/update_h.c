@@ -13,10 +13,43 @@ double scalar_force(Real eps) {
   double returnit = 0.0;
 
   // Just subtract sigma from the momenta and compute average force
-  FORALLSITES(i, s) {
+  /*FORALLSITES(i, s) {
     scalar_mult_dif_as(&(s->sigma), eps, &(mom[i]));
     returnit += magsq_as(&(s->sigma));
+  }*/
+  
+  //Clear the force accumulator
+    FORALLSITES(i, s)
+       clear_as(&(force[i]));
+  // The force from the kinetic term is d'Alembertian acting on sigma field 
+  // To compute the force contribution from kinetic term we require two gather calls
+  for(dir = XUP; dir <= TUP; dir++){
+   tag[dir] = start_gather_site(F_OFFSET(sigma), sizeof(antisym), dir,
+                                    EVENANDODD, gen_pt[dir]);
+   tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(sigma), sizeof(antisym),OPP_DIR(dir),
+                                    EVENANDODD, gen_pt[OPP_DIR(dir)]);
   }
+  for(dir = XUP; dir <=TUP ; dir++){
+   wait_gather(tag[dir]);
+   wait_gather(tag[OPP_DIR(dir)]);
+
+   FORALLSITES(i,s){
+   as_copy((antisym *) gen_pt[dir][i],&tempas_dir);
+   as_copy((antisym *) gen_pt[OPP_DIR(dir)][i],&tempas_opp);
+   add_as(&tempas_dir,&tempas_opp,&tempas);
+   scalar_mult_add_as(&force[i],&tempas,-1.0*kappa,&force[i]);
+
+   }
+
+  }
+  // Add the contribution from on-site term 
+  // Update the momenta from the scalar force
+  FORALLSITES(i,s){
+    scalar_mult_add_as(&force[i],&(s->sigma),(1.0+2*kappa*NDIMS),&force[i]);
+    scalar_mult_add_as(&(mom[i]),&(force[i]),tr,&(mom[i]));
+    returnit += magsq_as(&force[i]);
+  }
+
   g_doublesum(&returnit);
   return (eps * sqrt(returnit) / volume);
 }
