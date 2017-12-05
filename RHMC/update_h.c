@@ -10,6 +10,8 @@
 double scalar_force(Real eps) {
   register int i;
   register site *s;
+  msg_tag *tag[2*NDIMS];
+  antisym tempas,tempas_dir,tempas_opp;
   double returnit = 0.0;
 
   // Just subtract sigma from the momenta and compute average force
